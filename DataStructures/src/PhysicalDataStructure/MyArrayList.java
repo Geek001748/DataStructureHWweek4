@@ -23,7 +23,7 @@ public class MyArrayList<T extends Iterable<T>> implements MyList<T>
     }
     boolean isIndex(int n)
     {
-        if (n < 0 && n >= size)
+        if (n < 0 || n >= size)
             return false;
         return true;
     }
@@ -55,7 +55,8 @@ public class MyArrayList<T extends Iterable<T>> implements MyList<T>
     }
 
     @Override
-    public void add(int index, T item) {
+    public void add(int index, T item)
+    {
        if (!isIndex(index))
         {
             fakeIndex();
@@ -76,105 +77,160 @@ public class MyArrayList<T extends Iterable<T>> implements MyList<T>
     }
 
     @Override
-    public void addFirst(T item) {
-        if (size == capacity)
-        {
-           increaseBuffer();
-        }
-        else
-        {
-            for (int i = size; i > 0; i--)
-            {
-                array[i] = array[i - 1];
-            }
-            array[0] = item;
-            size++;
-        }
+    public void addFirst(T item)
+    {
+        add(0, item);
     }
 
     @Override
-    public void addLast(T item) {
-        if (size == capacity)
-        {
-           increaseBuffer();
-        }
-        else
-        {
-            array[size] = item;
-            size++;
-        }
+    public void addLast(T item)
+    {
+        add(item);
     }
 
     @Override
-    public T get(int index) {
-        if (size == capacity)
+    public T get(int index)
+    {
+        if (!isIndex(index))
         {
-           increaseBuffer();
+            fakeIndex();
+            return null;
         }
-        else
-        {
-            return array[index];
-        }
+        return (T)array[index];
     }
 
     @Override
-    public T getFirst() {
-        return null;
+    public T getFirst()
+    {
+        return get(0);
     }
 
     @Override
-    public T getLast() {
-        return null;
+    public T getLast()
+    {
+        if (size==0)
+            return null;
+        return get(size - 1);
     }
 
     @Override
     public void remove(int index) {
-
+        if (size == 0 || !isIndex(index))
+        {
+            fakeIndex();
+        }
+        else
+        {
+            for (int i = index; i < size - 1; i++)
+            {
+                array[i] = array[i + 1];
+            }
+            size--;
+        }
     }
 
     @Override
-    public void removeFirst() {
-
+    public void removeFirst()
+    {
+        remove(0);
     }
 
     @Override
-    public void removeLast() {
-
+    public void removeLast()
+    {
+        if(size == 0)
+            fakeIndex();
+        else
+            remove(size - 1);
     }
 
     @Override
-    public void sort() {
+    public void sort()
+    {
+        boolean swapped;
+        for (int i = 0; i < size - 1; i++)
+        {
+            swapped = false;
+            for (int j = 0; j < size - i - 1; j++)
+            {
+                Comparable<T> element1 = (Comparable<T>) array[j];
+                Comparable<T> element2 = (Comparable<T>) array[j + 1];
 
+                // Check if we need to swap array[j] and array[j + 1]
+                if (element1.compareTo((T) element2) > 0)
+                {
+                    Object temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+        // If no two elements were swapped by inner loop, then break
+        if (!swapped) {
+            break;
+        }
+    }
+}
+
+
+    @Override
+    public int indexOf(Object object)
+    {
+       for (int i = 0; i < size; i++) {
+        // Check for NullPointerException
+            if (object == null && array[i] == null)
+            {
+                return i;
+            }
+            if (object != null && object.equals(array[i]))
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
-    public int indexOf(Object object) {
-        return 0;
+    public int lastIndexOf(Object object)
+    {
+        for (int i = size; 0 <= size; i--) {
+        // Check for NullPointerException
+            if (object == null && array[i] == null)
+            {
+                return i;
+            }
+            if (object != null && object.equals(array[i]))
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
-    public int lastIndexOf(Object object) {
-        return 0;
+    public boolean exists(Object object)
+    {
+        return indexOf(object) != -1;
     }
 
     @Override
-    public boolean exists(Object object) {
-        return false;
+    public Object[] toArray()
+    {
+        Object[] resultArray = new Object[size];
+        System.arraycopy(array, 0, resultArray, 0, size);
+        return resultArray;
     }
 
     @Override
-    public Object[] toArray() {
-        return new Object[0];
+    public void clear()
+    {
+       array = new Object[baseCapacity];
+       size = 0;
     }
 
     @Override
-    public void clear() {
-       Object[] array2 = new Object[baseCapacity];
-       array = array2;
-    }
-
-    @Override
-    public int size() {
+    public int size()
+    {
         return size;
     }
 }
