@@ -6,7 +6,7 @@ public class MyLinkedList<T extends Comparable<T> & Iterable<T>> implements MyLi
     private MyNode<T> tail;
     private int size;
 
-    private class MyNode<E> 
+    private class MyNode<E>
     {
         E data;
         MyNode<E> next;
