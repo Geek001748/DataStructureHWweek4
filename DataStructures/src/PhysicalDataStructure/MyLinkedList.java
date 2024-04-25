@@ -1,19 +1,22 @@
 package PhysicalDataStructure;
 
-public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
+public class MyLinkedList<T extends Comparable<T> & Iterable<T>> implements MyList<T>
 {
     private MyNode<T> head;
     private MyNode<T> tail;
     private int size;
-    private static int capacity = 10;
-    private static final int baseCapacity = 10;
-    private class MyNode<E> {
+
+    private class MyNode<E> 
+    {
         E data;
-            MyNode<E> next;
+        MyNode<E> next;
         MyNode<E> prev;
-        MyNode (E data)
+
+        MyNode(E data)
         {
             this.data = data;
+            this.next = null;
+            this.prev = null;
         }
     }
 
@@ -22,15 +25,14 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
         head = tail = null;
         size = 0;
     }
-    boolean isIndex(int n)
+
+    private void checkIndex(int index)
     {
-        if (n < 0 || n >= size)
-            return false;
-        return true;
-    }
-    void fakeIndex()
-    {
-        System.out.println("You input wrong index, please repeat in range (0 - " + size + ")");
+        if (index < 0 || index >= size)
+        {
+
+            throw new IndexOutOfBoundsException("Index: " + index + ", size: " + size);
+        }
     }
 
     @Override
@@ -40,39 +42,32 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
         if (head == null)
         {
             head = tail = newNode;
-        }
-        else
+        } else
         {
-           tail.next = newNode;
-           tail = newNode;
+            tail.next = newNode;
+            tail = newNode;
         }
-        size ++;
+        size++;
     }
 
     @Override
     public void set(int index, T item)
     {
-        if (!isIndex(index)) {
-            fakeIndex();
+        checkIndex(index);
+        MyNode<T> curr = head;
+        for (int i = 0; i < index; i++)
+        {
+            curr = curr.next;
         }
-        else {
-            MyNode<T> curr = head;
-            for (int i = 0; i < index; i++)
-            {
-                curr = curr.next;
-            }
-            curr.data = item;
-        }
+        curr.data = item;
     }
 
     @Override
     public void add(int index, T item)
     {
         MyNode<T> newNode = new MyNode<>(item);
-        if (!isIndex(index)) {
-            fakeIndex();
-        }
-        else if(index == 0)
+        checkIndex(index);
+        if (index == 0)
         {
             newNode.next = head;
             head = newNode;
@@ -80,9 +75,9 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
             {
                 tail = newNode;
             }
-            size ++;
-        }
-        else {
+            size++;
+        } else
+        {
             MyNode<T> curr = head;
             for (int i = 0; i < index - 1; i++)
             {
@@ -94,7 +89,7 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
             {
                 tail = newNode;
             }
-            size ++;
+            size++;
         }
     }
 
@@ -110,27 +105,16 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
         add(item);
     }
 
-    public void recursionGet(MyNode<T> node, int index)
-    {
-       if(index == 0)
-       {
-           return node;
-       }
-       if (node == null)
-       {
-           throw new IndexOutOfBoundsException("Index out of bounds");
-       }
-       return recursionGet(node.next);
-    }
     @Override
     public T get(int index)
     {
-        if(!isIndex(index))
+        checkIndex(index);
+        MyNode<T> curr = head;
+        for (int i = 0; i < index; i++)
         {
-            fakeIndex();
-            return null;
+            curr = curr.next;
         }
-        return recursionGet(head, index);
+        return curr.data;
     }
 
     @Override
@@ -148,20 +132,16 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
     @Override
     public void remove(int index)
     {
-        if(!isIndex(index) || size == 0)
-        {
-            fakeIndex();
-        }
-        else if (index == 0)
+        checkIndex(index);
+        if (index == 0)
         {
             head = head.next;
-            if(size == 1)
+            if (size == 1)
             {
                 tail = null;
             }
             size--;
-        }
-        else
+        } else
         {
             MyNode<T> curr = head;
             for (int i = 0; i < index - 1; i++)
@@ -186,25 +166,83 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
     @Override
     public void removeLast()
     {
-       remove(size - 1);
+        remove(size - 1);
     }
 
     @Override
     public void sort()
     {
+         if (size > 1)
+         {
+             boolean wasChanged;
+             do
+             {
+                 MyNode<T> curr = head;
+                 MyNode<T> prev = null;
+                 MyNode<T> next = (curr != null) ?curr.next :null;
+                 wasChanged  = false;
 
+                 while (next != null)
+                 {
+                     if (curr.data.compareTo(next.data) > 0)
+                     {
+                         wasChanged = true;
+
+                         if (prev != null)
+                         {
+                             prev.next = next;
+                         } else
+                         {
+                             head = next;
+                         }
+                         curr.next = next.next;
+                         next.next = curr;
+
+                         prev = next;
+                         next = curr.next;
+                     }
+                     else
+                     {
+                         prev = curr;
+                         curr = next;
+                         next = next.next;
+                     }
+
+                     if (curr == tail)
+                     {
+                         tail = prev;
+                     }
+                 }
+             }while (wasChanged);
+         }
     }
 
     @Override
     public int indexOf(Object object)
     {
-        return 0;
+        MyNode<T> curr = head;
+        for (int index = 0;curr != null; curr = curr.next, index++)
+        {
+            if (object == null ? curr.data == null : object.equals(curr.data))
+            {
+                return index;
+            }
+        }
+        return -1;
     }
 
     @Override
     public int lastIndexOf(Object object)
     {
-        return 0;
+        MyNode<T> curr = tail;
+        for (int index = size - 1;curr != null; curr = curr.prev, index--)
+        {
+            if (object == null ? curr.data == null : object.equals(curr.data))
+            {
+                return index;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -213,7 +251,7 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
         MyNode<T> curr = head;
         while (curr.next != null)
         {
-            if (curr == null && object == null || curr != null && curr.equals(object))
+            if (object == null ? curr.data == null : object.equals(curr.data))
             {
                 return true;
             }
@@ -239,8 +277,8 @@ public class MyLinkedList<T extends Iterable<T>> implements MyList<T>
     @Override
     public void clear()
     {
-       head = tail = null;
-       size = 0;
+        head = tail = null;
+        size = 0;
     }
 
     @Override
