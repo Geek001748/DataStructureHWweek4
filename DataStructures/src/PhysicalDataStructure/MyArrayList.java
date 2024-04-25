@@ -1,5 +1,5 @@
 package PhysicalDataStructure;
-public class MyArrayList<T extends Iterable<T>> implements MyList<T>
+public class MyArrayList<T> implements MyList<T>
 {
     private Object[] array;
     private int size = 0;

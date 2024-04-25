@@ -1,6 +1,6 @@
 package PhysicalDataStructure;
 
-public class MyLinkedList<T extends Comparable<T> & Iterable<T>> implements MyList<T>
+public class MyLinkedList<T extends Comparable<T>> implements MyList<T>
 {
     private MyNode<T> head;
     private MyNode<T> tail;

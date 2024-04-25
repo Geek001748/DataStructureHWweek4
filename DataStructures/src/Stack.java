@@ -1,6 +1,6 @@
 import PhysicalDataStructure.MyLinkedList;
 
-public class Stack <T extends Comparable<T> & Iterable<T>>
+public class Stack <T extends Comparable<T>>
 {
     private final MyLinkedList<T> list = new MyLinkedList<T>();
     public boolean isEmpty()

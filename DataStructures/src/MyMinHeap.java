@@ -1,6 +1,6 @@
 import PhysicalDataStructure.MyArrayList;
 
-public class MyMinHeap<T extends Comparable<T> & Iterable<T>>
+public class MyMinHeap<T extends Comparable<T>>
 {
     private final MyArrayList<T> heap;
     public MyMinHeap()
